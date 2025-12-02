@@ -21,3 +21,18 @@ def can_generate_episode(user):
     if episodes_today >= FREE_DAILY_LIMIT:
         return False, "Daily free episode limit reached. Upgrade to Pro for unlimited episodes."
     return True, ""
+
+def get_thumbnail_url(title):
+    title = title.lower()
+
+    if "motivation" in title or "focus" in title:
+        return "https://source.unsplash.com/featured/?motivation"
+
+    if "calm" in title or "sleep" in title:
+        return "https://source.unsplash.com/featured/?calm"
+
+    if "learn" in title or "tech" in title or "coding" in title:
+        return "https://source.unsplash.com/featured/?technology"
+
+    return "https://source.unsplash.com/featured/?podcast"
+
