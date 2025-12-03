@@ -4,23 +4,24 @@ from .models import PodcastEpisode
 
 FREE_DAILY_LIMIT = 1  
 
+# podcast/utils.py
+from django.utils import timezone
+from .models import PodcastEpisode
+
+FREE_DAILY_LIMIT = 1
+
 def can_generate_episode(user):
-    """
-    Return (True, '') if the user can request a new episode now.
-    Otherwise return (False, message).
-    """
-   
     plan = getattr(getattr(user, "subscription", None), "plan", "free")
-
-    if plan == "pro" or plan == "enterprise":
+    if plan in ("pro", "enterprise"):
         return True, ""
-
-    
     today = timezone.now().date()
-    episodes_today = PodcastEpisode.objects.filter(user=user, created_at__date=today).count()
-    if episodes_today >= FREE_DAILY_LIMIT:
-        return False, "Daily free episode limit reached. Upgrade to Pro for unlimited episodes."
+    cnt = PodcastEpisode.objects.filter(user=user, created_at__date=today).count()
+    if cnt >= FREE_DAILY_LIMIT:
+        return False, "Daily free episode limit reached. Upgrade to Pro."
     return True, ""
+
+def estimate_tokens_for_script(script_text):
+    return max(1, len(script_text) // 4)
 
 def get_thumbnail_url(title):
     title = title.lower()
