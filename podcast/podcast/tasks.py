@@ -2,8 +2,10 @@
 import os
 from celery import shared_task
 from django.utils import timezone
+
+from .cloudinary import upload_audio_to_cloudinary
 from .models import PodcastEpisode
-from .agent import generate_podcast_script, generate_audio_from_script, get_thumbnail_url
+from .agent import generate_podcast_script,text_to_speech_and_upload, process_podcast_text, get_thumbnail_url
 from .uploaders import upload_to_supabase
 from .utils import estimate_tokens_for_script
 
@@ -14,36 +16,16 @@ def process_podcast_episode(self, episode_id, user_interest=None, tone="motivati
         episode.status = "generating"
         episode.save()
 
-        # 1) Generate script
-        script = generate_podcast_script(topic=episode.title, user_interest=user_interest or episode.title)
-        if not script:
-            episode.status = "failed"
-            episode.save()
-            return {"error": "script_failed"}
+        script = generate_podcast_script(topic = episode.title, user_interest = user_interest or episode.title)
 
-        episode.script = script
-        episode.save()
+        audio_urls = text_to_speech_and_upload(script)
 
-        # 2) Generate audio (TTS)
-        audio_path = generate_audio_from_script(script)
-        if not audio_path:
-            episode.status = "failed"
-            episode.save()
-            return {"error": "tts_failed"}
+        audio_url = audio_urls[0] if audio_urls else None
 
-        # 3) Upload to Supabase
-        audio_url = upload_to_supabase(audio_path)
-        try:
-            os.remove(audio_path)
-        except Exception:
-            pass
-
-        # 4) Thumbnail
-        image_url = get_thumbnail_url(episode.title)
-
+        thumbnail_url = get_thumbnail_url(topic=episode.title)
         # 5) Save update
         episode.audio_url = audio_url
-        episode.image_url = image_url
+        episode.image_url = thumbnail_url
         episode.status = "completed"
         episode.tokens_used = estimate_tokens_for_script(script)
         episode.save()
