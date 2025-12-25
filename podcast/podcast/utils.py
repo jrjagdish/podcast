@@ -2,13 +2,13 @@
 from django.utils import timezone
 from .models import PodcastEpisode
 
-FREE_DAILY_LIMIT = 1  
+FREE_DAILY_LIMIT = 1 
 
 # podcast/utils.py
 from django.utils import timezone
 from .models import PodcastEpisode
 
-FREE_DAILY_LIMIT = 1
+FREE_DAILY_LIMIT = 25
 
 def can_generate_episode(user):
     plan = getattr(getattr(user, "subscription", None), "plan", "free")
