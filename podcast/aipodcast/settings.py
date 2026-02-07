@@ -84,7 +84,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "job_hunt.urls"
+ROOT_URLCONF = "aipodcast.urls"
 
 TEMPLATES = [
     {
@@ -101,7 +101,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "job_hunt.wsgi.application"
+WSGI_APPLICATION = "aipodcast.wsgi.application"
 
 
 # Database
