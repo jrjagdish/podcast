@@ -23,7 +23,7 @@ GROQ_API_KEY = os.getenv(
     "GROQ_API_KEY")
 
 
-client = Groq(api_key="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")
+client = Groq(api_key=GROQ_API_KEY)
 
 
 # ==============================
